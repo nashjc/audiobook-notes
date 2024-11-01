@@ -19,3 +19,13 @@ suspect Python might be more widely practiced for these sorts of exercises, but 
 allow me to experiment quickly and interactively. 
 
 I've a work-in-progress write-up of my explorations as 
+https://github.com/nashjc/audiobook-notes/blob/main/AudiobookExperiments.pdf with the corresponding
+RMarkdown (.Rmd) file being the source text.
+
+As and when some of the tools and ideas discussed here become established as useful and stable, I
+am hopeful that they can be incorporated in Christopher's repository for the convenience of other
+workers. I welcome comments and collaboration, as one of my motivations is to provide material for
+a friend who is legally blind. My gratitude to all who have contributed to making possible TTS
+tools, as my friend has said that the output audio quality and rhythm is, overall, very good.
+
+John Nash, 2024-11-01
