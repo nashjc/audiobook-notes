@@ -13,6 +13,9 @@ for (i in 1:length(ll)){
   fn<-ll[i]
   cmd <- paste("epub2tts-edge --speaker=", spkr," --cover ",covimg," ",fn,sep='')
   cat(cmd,"\n")
-  system(cmd)
+  rc<-system(cmd)
+  if (rc != 0) {
+    tmp<-readline("There was an error here.")
+  }
 }
 cat("Done!\n")

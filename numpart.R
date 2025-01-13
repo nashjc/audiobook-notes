@@ -1,6 +1,5 @@
 # numpart.R
 # converts book that has '*  *  *' sections changed to '# Part ??'
-# ?? needs testing
 
 ifn <- readline("Input filename:")
 pn <- 0
@@ -13,7 +12,6 @@ ofcon <- file(ofn, open="w")
 while ( TRUE ) {
   line = readLines(con, n = 1)
   if (length(line)==0) {
-    # close(con)
     break
   }
   if ( substr(line, 1, 9) == pat) {

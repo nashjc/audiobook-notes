@@ -16,10 +16,10 @@ source("./e2tprofile.R") # Name is fixed -- always same
 Sys.time()
 snampub <- paste(epath,sroot,".epub",sep='')
 cmd <- paste("cp ",epath,epubname," ",snampub,sep='')
-system(cmd) # get short name epub
+try(system(cmd)) # get short name epub -- use try() to see if error ignored
 Sys.time()
 cmd<-paste("epub2tts-edge ",snampub,sep='')
-system(cmd) # gets short.txt and short.png -- they will be in directory where epub is found
+try(system(cmd)) # gets short.txt and short.png -- they will be in directory where epub is foundSys.time()
 Sys.time()
 covnam <- paste(sroot,".png",sep='') # this won't be original cover image file
 # Get header material

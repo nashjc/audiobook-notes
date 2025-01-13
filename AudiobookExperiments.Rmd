@@ -1,7 +1,7 @@
 ---
 title: "Experiments in generating audiobook files with epub2tts-edge"
 author: "John C Nash"
-date: "2024-10-19"
+date: "2025-01-09"
 output: pdf_document
 ---
 
@@ -9,7 +9,7 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-### Initial version 2024-07-29, revised 2024-10-19
+### Initial version 2024-07-29, revised 2024-10-19, 2025-01-09
 
 ## Background
 
@@ -30,7 +30,9 @@ files. This article is a set of notes on some experiments with freely available
 software to do precisely this.
 
 Popularly such software is called "artificial intelligence", but "large language
-models" more correctly describes the programs. In particular, the software used
+models" more correctly describes the programs, since they use models of how 
+language is pronounced and expressed to create the sounds of a human voice in a
+particular accent and style. In particular, the software used
 in developing this report comes from the Github project **epub2tts-edge** of
 Christopher Aedo. See https://github.com/aedocw/epub2tts-edge. Aedo has done a
 great service in this and the earlier **epub2tts** project which is based on 
@@ -46,7 +48,7 @@ to improve outputs or make them more usable to potential listeners.
 ## Source works
 
 I have generally put my creative writing on the UK writers' site *https://obooko.com.*
-This currently is twelve novels and two collections of memoir/short story
+This currently is about a dozen novels and two collections of memoir/short story
 material. A feature of several of my works is that they involve more than one 
 language. My first novel, **Thursday Afternoon**, for example, has a scene where
 a young Canadian airforceman is working with some British soldiers and a Flemish
@@ -54,15 +56,19 @@ woman to find and clear a landmine in 1944 Flanders. The Flemish woman communica
 with the Canadian in French, but falls back into Flemish on occasions. There are
 thus three languages mixed in a couple of pages of text, which is a challenge to
 the software. Moreover, I have yet to discover how to inform the software of the
-language to be read, though I feel certain there must be a way to do this.
+language to be read, though I feel certain there must be a way to do this. For 
+example, I am surprised that simple tags cannot be put into the text to be read
+giving the language which follows. Similarly, some indication where emphasis is
+desired would be useful.
 
 ## Installation of the software
 
-Setup followed instructions in the github repositories to install the software for the two 
+Setup of **epub2tts-edge** followed instructions in the github repositories to 
+install the software for the two 
 projects. Note that this may involve a considerable download of code and
-binaries depending on the existing software installation. I worked with Linux Mint. 
-One limitation for me is a lack of
-CUDA capable graphical processing units (GPUs), so performance of the
+binaries depending on the existing software installation. I worked with Linux Mint 
+version 22 (Wilma). One limitation for me is a lack of
+CUDA-capable graphical processing units (GPUs), so performance of the
 tools on my computers was somewhat lacklustre. Typically rendering of
 an epub to an m4b or mp3 took over an hour.
 
@@ -70,23 +76,27 @@ Note that the `epub2tts-edge` software currently calls for Python support using
 at least version 3.11 or later. The audio rendering also needs an active internet
 connection. 
 
-The software also was developed for a Linux environment. While there is the possibility
+The software was apparently developed for a Linux environment. While there is the possibility
 in Windows of running the Windows Subsystem for Linux, I have chosen to use Oracle
-VirtualBox to install Linux Mint 22 (Wilma). Indeed, because my working platform is
-an earlier Linux Mint and I do not wish to disturb some stable facilities, I have
-installed LM22 under my existing version. My writing colleague and coordinator of the
-Stittsville Creative Writers Group, R J Partington, installed LM22 under Windows.
-This has the advantage of isolating the text to speech work from other ongoing 
-activities.
+VirtualBox to install Linux Mint 22 (Wilma) and run the software within a virtual
+machine (VM). This has the advantage of isolating the text to speech work from other ongoing 
+activities. Initially, my working platform was an earlier Linux Mint with Python 3.09.
+I did not wish to disturb some stable facilities of my working environment, 
+though I have since upgraded the host
+to LM22. My writing colleague and coordinator of the Stittsville Creative Writers Group, 
+R J Partington, installed LM22 under Windows. Another colleague in the group, 
+Allan McCarville wanted to install on a Macintosh, but we had difficulty getting
+that set up, and it seems likely he will repurpose an older PC to work with audiobooks.
 
 ## Standard usage of the software
 
 We assume we have followed instructions in the Github repository to install the
 software. 
 
-**epub2tts-edge** is intended to be applied to an **epub** file. (https://www.w3.org/publishing/epub3/, 
-https://en.wikipedia.org/wiki/EPUB). Such 
-files are packaged collections of HTML text and metadata. Suppose that
+**epub2tts-edge** is intended to be applied first to an **epub** file. Such files
+are described in https://www.w3.org/publishing/epub3/ and 
+https://en.wikipedia.org/wiki/EPUB; they are packaged collections of HTML text 
+and metadata. Suppose that
 we have a file **mybook.epub**. Then we first convert this file to a properly
 structured plain text file **mybook.txt** by opening a terminal (command line
 screen) and issuing the command
@@ -96,7 +106,7 @@ screen) and issuing the command
 ```
 
 This takes only a few seconds to execute. 
-This creates a file mybook.txt and extracts a cover image 
+This (usually) creates a file mybook.txt and extracts a cover image 
 mybook.png from the epub file. The text file begins with two 
 lines of the form
 
@@ -109,21 +119,30 @@ It also has some lines that commence with a hash symbol (#) that
 give "chapters" or "sections" and the text behind the hash is read
 out in the output audio as a chapter heading. However, the algorithm
 by which these lines are created is not clear to me, but they can be
-artificially inserted into the file, or if generated ones like
+manually inserted into the file or edited with a plain text editor.
+For example, generated ones like
 
 ```
 # Part 24 
 ```
 
-they can be edited to a more desirable phrase.
+can be edited to a more desirable phrase like 
+
+```
+# Part 24 -- At the party
+```
+
+
 Text following the hash is read
 as the title of the section. Below we discuss how to break up the work and have separate
-audio files, which also serves to allow for correction of individual parts.
+audio files, which is important in saving time and effort for correction of individual parts
+of the overall novel or story.
 
 ### Failure of the epub to text process
 
 We have observed some cases where `epub2tts-edge` fails to carry out the conversion
-to text and extraction of the cover image. There are two other approaches we have used.
+to text and extraction of the cover image. There are at least two other approaches 
+we have used, and some others we have investigated:
 
 1) **calibre** program `ebook-convert`
 
@@ -136,7 +155,9 @@ ebook-convert myfile.epub myfile.txt
 
 Generally `myfile.txt` will be more or less correctly formatted, though we have
 noticed that the initial "Title:" and "Author:" may be combined in one line. This
-can, of course, be corrected with a text editor.
+can, of course, be corrected with a text editor. This tools should be the first 
+alternative to `epub2tts-edge` when that
+program fails to convert the epub successfully.
 
 2) **pandoc**
 
@@ -146,17 +167,47 @@ pandoc -f epub -t plain -o myfile.txt myfile.epub
 
 will create a text version of the epub. Unfortunately, it often breaks paragraphs
 into multiple lines which cause undesirable pauses in the eventual audio file(s).
-Moreover, the section delimiters ("# (some text)") are often missing. This is the
-difficult workaround when all else fails.
+(See 
+https://unix.stackexchange.com/questions/647686/convert-epub-to-txt-and-preserve-original-formatting).
+Moreover, the section delimiters ("# (some text)") are often missing. 
+`pandoc` also leaves two line endings between "paragraphs". It should be 
+noted that epub2tts-edge then pauses for each line ending, so these single 
+line endings need to be removed. 
+However, there are some parts of the epub such as the title and cover pages where we would like 
+to retain the single line endings (or double them to ensure separation of important fields that 
+should be read separately).
+Note that omitting the "-t plain" option leaves some tags within the resulting text file that 
+could cause unwanted spoken material. 
+
+3) Some word processing programs like **Word** or **LibreOffice** may be able to 
+save a text file, but likely the user will need to manually edit the output.
+
+CAUTION: Plain text often gets corrupted (or perhaps "enhanced") by word processing
+software. It is advisable to use an editor for plain text. In Linux, I like 
+**L3afpad** and **gedit**. In Windows, the rather ancient **Notepad** is still
+a reliable standby. Below we discuss some tweaks to the text file that are generally
+needed to give a polished audiobook. For example, each paragraph should be a single
+line terminated with a line ending.
+
+4) I could not get the software **epub2txt2** (https://github.com/kevinboone/epub2txt2) to 
+compile (and hence was unable to install it).
+
+5) **epub2txt** is a Python program (https://github.com/ffreemt/epub2txt) that can be
+easily installed with the command `pip install epub2txt` if Python is properly set
+up. This seems to get all the material, but gives no spaces between what would be
+"paragraphs". Moreover, verbatim material has line endings, so some attention to 
+that detail may be relevant.
 
 ### Conversion to audio file(s)
 
-The much longer process is converting the text file to an audio file of type
+The much longer process that **epub2tts-edge** carries out is converting the 
+text file to an audio file of type
 m4b (https://www.lifewire.com/m4b-file-2621958). For a novel, this may take of the 
 order of an hour if the work is
 in a single computer text file. Breaking up the text file into parts is therefore
 helpful for repairing glitches in individual sections, and my experience is that
-these glitches are inevitable. 
+these glitches are inevitable. We want to avoid having to re-run the process for
+the whole book rather than one section.
 
 The second stage run of **epub2tts-edge** generally requires us to specify a "voice" 
 or "speaker". If no speaker is given, a neutral English-only speaker with a quite
@@ -166,7 +217,8 @@ For example, the specifier **en-US-AndrewMultilingualNeural** will use the same 
 as the default **for English**, but process multiple languages using **different** speaker
 voices for the other languages, which is disconcerting for the listener. Note that it seems 
 that different "speaker" specifications will handle the same text differently and some 
-words pronounced correctly by one voice will be mangled by another.
+words pronounced correctly by one voice will be mangled by another. We have yet to
+find out how to get a seemingly common voice for different languages.
 
 The second stage command can also specify a cover image which can be in jpg or png format.
 The command is
@@ -175,16 +227,17 @@ The command is
     epub2tts-edge --speaker speakerID --cover mybook.png  mybook.txt
 ```
 
-where speakerID is a valid speaker identifier and mybook.png (or some other png
+where `speakerID` is a valid speaker identifier and `mybook.png` (or some other png
 or jpg image file) 
-is a cover image available in the same directory as mybook.txt. The output will be
-a file mybook-speakerID.m4b. This can be a very large file of several hundred megabytes
+is a cover image available in the same directory as `mybook.txt`. The output will be
+a file `mybook-speakerID.m4b`. This can be a very large file of several hundred megabytes
 for a full novel, and take 8-16 hours to play. The m4b format allows bookmarks so the
 user can pause and restart. On the other hand, older devices may not be able to play
 these files. They are, however, convertible to other audio file formats, in particular
 mp3. 
 
-Note that line breaks in the text file mybook.txt cause quite long pauses in the
+As mentioned, paragraphs should not have line breaks. Such line breaks in the text 
+file `mybook.txt` cause quite long pauses in the
 voice reading. Therefore line breaks that are non-pausing should be removed, giving
 full paragraphs on a single "line". 
 
@@ -193,46 +246,17 @@ full paragraphs on a single "line".
 ### Omitted text
 
 **WARNING**: I have discovered that text in an epub file that is in a monospaced
-(i.e., typewriter-like) font is somehow eliminated completely from the file mybook.txt
+(i.e., typewriter-like) font is somehow eliminated completely from the file `mybook.txt`
 and must be re-inserted manually. This is a nuisance and can cause grief. For example,
 in my novels, I use such fonts for "letters" and other correspondence or quotations
 such as the text on a tombstone. I have had some email correspondence with Christopher
-Aedo about this, but so far we have not found the source of the glitch. (?? Note 2024-11-01:
-This may have been fixed and needs a test.)
+Aedo about this, but so far we have not found the source of the glitch. (Note 2024-11-01:
+This may have been fixed, at least in part, but has not been tested.)
 
-It is feasible to replace the first stage run of epub2tts-edge with a different 
-translator from epub to text as we have noted above. Some other choices are noted
-here.
+As mentioned, it is feasible to replace the first stage run of epub2tts-edge with a different 
+translator from epub to text. Some other choices were noted above.
 
-- I could not get the software **epub2txt2** (https://github.com/kevinboone/epub2txt2) to 
-compile (and hence was unable to install it).
-
-- **epub2txt** is a Python program (https://github.com/ffreemt/epub2txt) that can be
-easily installed with the command `pip install epub2txt` if Python is properly set
-up. This seems to get all the material, but gives no spaces between what would be
-"paragraphs". Moreover, verbatim material has line endings, so some attention to 
-that detail may be relevant.
-
-- **pandoc**, as noted above, does not keep paragraphs together as a single "line".
-(See 
-https://unix.stackexchange.com/questions/647686/convert-epub-to-txt-and-preserve-original-formatting).
-`pandoc` leaves two line endings between "paragraphs" but has line endings 
-within paragraphs to make the
-text easy to display in a text editor that does not wrap lines. It should be 
-noted that epub2tts-edge
-then pauses for each line ending, so these single line endings need to be removed. 
-However, there are
-some parts of the epub such as the title and cover pages where we would like 
-to retain the single line
-endings (or double them to ensure separation of important fields that 
-should be read separately).
-Note that omitting the "-t plain" option leaves some tags within the 
-resulting text file that 
-could cause unwanted spoken material. 
-
-- The `ebook-convert` program from the **calibre** software, as noted above, works
-reasonably well. It should be the first alternative to `epub2tts-edge` when that
-program fails to convert the epub successfully.
+I have not tested to see if possibly material in some other fonts may be omitted.
 
 ### Lost features
 
@@ -240,14 +264,14 @@ I have not been able to get strikeout, bold or italic to be expressed in
 the audio output.
 
 Emphasis, by way of capitalization, is also lost, as can be seen by processing the file 
-**cap4emphasis.txt** through epub2tts-edge. Note line endings have been removed.
+**cap4emphasis.txt** (the text below) through epub2tts-edge. Note line endings have been removed.
 
 ```
 # Capitals for emphasis
 
 Putting words in capitals to emphasize them will only get them pronounced letter by letter in some cases. Hence capitalized "ARE" is not emphasized. Separated letters gives A R E. Simple "are" does not get emphasized. It would be useful to be able to ask **epub2tts-edge** to give emphasis.
 
-"I said," often has awkward pause or mis-emphasis
+"I said," often has awkward pauses or mis-emphasis.
 ```
 
 ### Difficulties with language change
@@ -263,7 +287,7 @@ when it is not correct.
 - The voice of the speaker may change drastically in the new language, which is 
 disconcerting for the reader.
 
-I have not (at 2024-8-5) yet found work-arounds for these issues.
+I have not (at 2024-1-9) yet found work-arounds for these issues.
 
 
 ## Workarounds
@@ -278,7 +302,7 @@ are a number of examples, all of which are small files that can be tested using
 where `[file]` is replaced by the appropriate identifier. Note that in some cases
 the long lines needed by epub2tts-edge give display problems for the Rmarkdown
 editor in R-studio (https://www.rstudio.com/categories/rstudio-ide/) 
-and the resulting pdf output.
+and the resulting pdf output in this document.
 
 
 ### 0pauses.txt
@@ -294,7 +318,10 @@ Like
 these
 ones.
 
-A period will give a break. Just like that. But shorter than line ending.
+A period will give a break. Just like that. But shorter than a line ending.
+
+And John C. Nash sounds incorrect compared to John C Nash with no period
+behind the middle initial.
 
 But dashes -- seem to be ignored.
 
@@ -305,6 +332,8 @@ What about a semicolon; does that work? More or less. Perhaps dashes are same.
 
 ```
 # titles.txt
+
+Abbreviations may or may not be expanded.
 
 Lt. Cmdr. Try full words "Lieutenant Commander" or phonetically Leftenant Commander
 
@@ -321,7 +350,9 @@ Monsieur Lefebvre not M. Lefebvre
 POWs  ("s" not pronounced sometimes). Try P O W's. 
 ```
 
-### titles.txt
+### names.txt
+
+Proper names, especially those originating outside English, cause mispronunciation.
 
 ```
 # names.txt
@@ -384,7 +415,7 @@ lead pronounced as "leed" (led for weight)
 ### numberpunctuation.txt
 
 ```
-#numberpunctuation.txt
+# numberpunctuation.txt
 
 Numbers, units and punctuation give difficulties.
 
@@ -428,6 +459,7 @@ I'll avv the recording of Ave Maria.
 ```
 
 ### Vocalizations
+
 Vocalizations like "oh", "er", "hmmph", "hmmm" sometimes get mangled, though 
 epub2tts-edge with the en-US-AndrewNeural voice seems to work reasonably well. 
 
@@ -461,10 +493,12 @@ and batch process them with a small (Linux / bash) command-line script.
 #
 # convm4b
 mkdir newfiles
-for f in *.m4b; do ffmpeg -i "$f" -codec:v copy -codec:a libmp3lame -q:a 2 newfiles/"${f%.m4b}.mp3"; done
+for f in *.m4b; do 
+ffmpeg -i "$f" -codec:v copy -codec:a libmp3lame -q:a 2 newfiles/"${f%.m4b}.mp3"
+done
 ```
 
-**Open question** What is Windows / Mac equivalent?
+**Open question** What are Windows / Mac equivalents?
 
 ### Breaking a large mp3 file into pieces
 
@@ -502,11 +536,40 @@ Another tool is **mp3wrap**, which uses a command
 mp3wrap [options]  OUTPUTFILE  f1.mp3  f2.mp3  [f3.mp3]
 ```
 
-Unfortunately, there is a limit to the number of files that can be included,
-but the number does not appear to be documented. 
+Unfortunately, there seems to be a limit to the number of files that can be included,
+but the number does not appear to be documented. One also needs to be careful to 
+ensure the ordering of the files.
 
 I was unable to get the program **mp3cat** from  https://github.com/dmulholl/mp3cat
 to work at all. 
+
+### m4b-tool
+
+https://github.com/sandreas/m4b-tool claims to do many of the operations we might
+wish to do to render audiobooks in convenient sizes etc. Unfortunately, I found
+
+- the software was NOT easy to install. 
+
+- I needed to get the `docker` software, 
+then try to install m4b-tool instance, 
+
+- I needed to create an alias to run the software (which disappeared
+over reboots, so I needed to explicitly save to `.bashrc`). 
+
+- I needed to add myself to the docker group before the tool would run.
+
+- Once installed, it did NOT work in all directories e.g., the shared
+directory of the Linux Mint 22 virtual machine in which I run all audiobook 
+work to keep software intact.
+
+- Once I did get it to start running, I got sporadic errors depending on where
+I started the software relative to input and output locations. 
+
+- It seems the software is fragile concerning cover images. 
+
+- I did manage to get the software to "sort of" work, with reported errors,
+though the output was satisfactory.
+
 
 ### Changing speed or tempo of audio
 
@@ -584,15 +647,31 @@ mixing these can be awkward. A suggestion is to use a style
 
 ## A recipe
 
-### Extracting the cover and the text
-
-**epub2tts-edge** aims to do this in the first pass using a command like
+### 1) Extracting the cover and the text
 
 `epub2tts-edge mybook.epub`
 
-which should give the cover image in file mybook.png and "text" 
-in file mybook.txt. The first lines of mybook.txt, which can be copied to a file 
-mybookheader.txt, are something like
+should give the cover image in file `mybook.png` and "text" 
+in file `mybook.txt`. 
+
+The program **epub-cover** can be used to extract the cover image. This is 
+part of the Ruby package epub-parser from https://gitlab.com/KitaitiMakoto/epub-parser.
+The syntax 
+
+`epub-cover mybook.epub` 
+
+will output whatever cover file is embedded in the epub, which may have a name
+somewhat different from the epub title, and may be a JPEG file. Note that one
+may choose to use epub2tts-edge to get mybook.png and then ignore the text file
+produced in case it is missing material that was in monospaced font.
+
+Note that the `ebook-edit` of the **Calibre** ebook software or `sigil` can both
+export the cover image.
+
+### 2) Add Title and Author
+
+The first lines of `mybook.txt`, which can be copied to a file 
+`mybookheader.txt`, should be something like
 
 ```
 Title: My fabulous book
@@ -603,53 +682,47 @@ Moreover, the software will try to create "parts" denoted with the hash (#) symb
 followed by a title, but this will depend to a large extent on the epub content
 structure.
 
+### 3) Check for monospaced material and insert
+
 Unfortunately, as we have noted, **epub2tts-edge**, using the Python library 
 **Beautiful Soup** (according to Christopher Aedo), fails to extract
 any material in a monospaced font.
 
-As an alternative process, we can use **pandoc** as follows:
+**ebook-convert** does the job reasonably well, but we may need to ensure the
+Title/Author header of the type `mybookheader.txt` mentioned above is present. 
+Moreover, some pauses in the address and date
+on letters may need to be inserted as punctuation or line endings.
 
-- A command like the following will extract text
+The issue of material which may be dropped by epub to text conversion is, I 
+believe, likely to remain for some time. This means that users/authors still need
+to check the output of the processes in the epub to audio conversion.
 
-`pandoc -f epub -t plain -o mybookp.txt mybook.epub`
+### 4) Consolidate paragraphs
 
-This file will NOT have headers for parts, nor will it have the header of the 
-type mybookheader.txt mentioned above, but the header can be added by using
-a text editor. Similarly, whatever divisions are present can be edited to 
+- Run the program **novelparas.R** to ensure text paragraphs are consolidated
+for the audio output. Even if the text has been extracted with epub2tts-edge,
+there may be manually inserted monospace text that requires paragraph consolidation
+to remove unwanted line endings.
+
+### 5) Edit for section divisions and their titles
+
+Whatever divisions are present (I divide sections with `* * *`) can be edited to 
 the form `# Part ??`, or such divisions can be inserted. Blank lines above
-and below the division are recommended.
+and below the division are recommended. This can easily be done with most text editors.
 
-- The program **epub-cover** can be used to extract the cover image. This is 
-part of the Ruby package epub-parser from https://gitlab.com/KitaitiMakoto/epub-parser.
+### 6) Section numbering
 
-`epub-cover mybook.epub` 
+Run **numpart.R** to get sections numbered. This replaces the `??` in `# Part ??`
+with appropriately sequenced numbers.
 
-will output whatever cover file is embedded in the epub, which may have a name
-somewhat different from the epub title, and may be a JPEG file. Note that one
-may choose to use epub2tts-edge to get mybook.png and then ignore the text file
-produced in case it is missing material that was in monospaced font.
+### 7) Standard cleanup of the text file
 
-### Cleanup of pandoc text output
+Besides the Author/Title header and the monospaced material, it is useful to check
+the text (before splitting by sections) to fix some issues.
 
-The text file produced by pandoc does not have the mybookheader.txt. Moreover, its
-paragraphs are NOT separated suitably for the second (main) stage of epub2tts-edge.
-
-- Add newlines after unseparated lines as appropriate, particularly in title page(s), where we do not want 
-paragraph run-on when we process the mybookp.txt to consolidate paragraphs.
-
-### Section dividers
-
-- For my own books, with `* * *` section separator, convert "* * *" to "# Part ??"
-throughout. This can be done with most text editors.
-
-- Check that there is a line ending for the final line of the mybook.txt file.
-
-- Add section dividers for the title page(s), the capsule comment and any
-preamble. Optionally expand or diminish the section divisions.
-
-### Avoiding some awkward pauses or mispronunciations
-
-In the text file mybook.txt.
+- **Front matter** often has symbols, such as copyright, or Internet addresses for
+web pages or email. These may need attention to get them read in a comprehensible
+way by the artificial voice. 
 
 - Remove periods after initials in author name(s) to avoid unnecessary pause.
 
@@ -660,19 +733,23 @@ In the text file mybook.txt.
 
 - Expand province or state abbreviations. 
 
-### Consolidate paragraphs
+- Some paragraphs as text will not offend the book reader, but when in audio form
+will not have the right pauses, so need splitting or combining
+for better flow when read out loud.
 
-- Run the program **novelparas.R** to ensure text paragraphs are consolidated
-for the audio output. Even if the text has been extracted with epub2tts-edge,
-there may be manually inserted monospace text that requires paragraph consolidation
-to remove unwanted line endings.
+- Check that there is a line ending for the final line of the mybook.txt file.
+This seemingly trivial change bit me in one conversion effort.
 
-### Phonetic corrections
+- Add section dividers for the title page(s), the capsule comment and any
+preamble. Optionally expand or diminish the section divisions.
+
+
+### 8) Phonetic corrections
 
 Proper names, dialect, homonyms and similar issues for text to speech should
-be corrected. 
-
-- We need a set of source / replacement choices. We shall suppose this is in the
+be corrected. To do this, I wrote a small program **wordsub.R** as a prototype
+for this operation. This program
+needs a set of source / replacement choices. We shall suppose this is in the
 form of lines
 
 ```
@@ -680,46 +757,77 @@ old (tab)  new
 ```
 
 This assumes 1-1 choices. We will manually deal with situations where there is 
-more than one choice using a text editor. A prototype script to process the
-substitutions, offering the user a choice to accept the suggested change (there
-are situations where we do NOT wish to take the suggestion), is **wordsub.R**.
-This script uses a named file **phoneticsub.txt** which has entries described
+more than one choice using a text editor. **wordsub.R** uses a named file 
+**phoneticsub.txt** which has entries as described
 above. To save computing time, it is worthwhile having a "master" file, call
 is **phoneticsub.full.txt** with all possible replacements. This file can be
-copied to phoneticsub.txt and unnecessary entry lines simply removed.
+copied to **phoneticsub.txt** and unnecessary entry lines simply removed.
 
-### Section numbering
 
-Run **numpart.R** to get sections numbered.
-
-### Section splitting
+### 9) Section splitting
 
 Run **splitnovel.R** to divide the source text into individual sections. This is
 helpful later when or if we discover that the conversion of text to speech has
 made an error or glitch. We can then attempt to correct the issue for just the
-single section. Once the text is adjusted appropriately, we can then re-work
-the section, if appropriate first inserting it into the consolidated module
-where it belongs.
+single (small?) section. Once the text is adjusted appropriately, we can then re-work
+the section, if necessary inserting it into a consolidated module where it belongs.
 
-### Section consolidation
+### 10) (Optional) Text section consolidation
 
-To provide suitably sized audio files, we consolidate the sections into modules
+To provide suitably sized audio files, we could consolidate the text sections into modules
 using **combpart.R**. 
 
-### Conversion to speech
+However, it is likely more human-efficient to create small audio files then 
+put these together with the help of a suitable program such as `joinmp3.R`.
+
+### 11) Conversion to speech
 
 The script **runedge.R** is intended to process the text modules (or sections)
 and produce files of type m4b. Note that this script is currently set up to be
-first edited to provide the right filename root for the modules and the correct
-cover image. 
+first edited to provide the right filename root for the modules and the
+correct cover image. 
 
 This stage of the process takes quite a long time -- typically of the order of
 an hour. 
 
-### (Optional) Adjust cover image
+### 12) Conversion to mp3
+
+Unfortunately, the tools for consolidation of sets of small m4b files into
+larger blocks are not, as far as we have so far found at least, reliable.
+There is a tool `m4b-tool` from https://github.com/sandreas/m4b-tool, but
+we could not get a satisfactory result. 
+
+The `ffmpeg` program does offer concatenation of mp3 files, and also will
+convert m4b files to mp3 (though apparently not concatenate m4b files).
+We set this operation up as a script `convm4b.sh` which is given in an
+appendix. (Note that the scripts may be still under development.)
+
+### 13) Consolidation of audio blocks
+
+We want our finalized audiobooks to be in parts small enough for users
+to navigate, that is, to move to particular parts. Our experience is that
+this means blocks of around one to two hours, or between five and ten 
+blocks for a book of reasonable length. With files of type m4b users can
+generally, with appropriate player software or devices, move quickly between
+sections. Still, we believe division of audiobooks into modestly-sized
+blocks of audio time is sensible.
+
+The program `joinmp3.R` calculates which small mp3 files to combine, then
+combines them, and then does some other operations as described in subsequent
+steps.
+
+### 14) Convert consolidated mp3 blocks to m4b format
+
+`joinmp3.R` also will convert the consolidated mp3 audio files to m4b
+format. It uses `ffmpeg` to do this. 
+
+### 15) Add a cover page to the files
+
+`joinmp3.R` will also add cover images to each of the large block files,
+both mp3 and m4b.
 
 The program **AtomicParsley** (https://github.com/wez/atomicparsley) can be
-used to insert a different cover image into m4b (and other audio) files.
+used to insert a different cover image into m4b (and some other audio) files.
 One syntax is
 
 ```
@@ -730,79 +838,49 @@ mv tmpx.m4b myfile.m4b
 rm tmp.m4b
 ```
 
-### Convert audio files to desired format
+However, we carefully avoid having an image in the mp3 blocks, so can
+simply add the "--artwork" and also author metadata (with the "--artist" 
+tag). 
 
-While m4b files are the current recommendation for audiobooks, many player
-devices do not handle them. Therefore, we may wish to convert the files. The
-Linux **bash** script **convm4b.sh** will handle this nicely, but there are
-many tools available in the common operating systems. (I welcome suggestions.)
+Atomic Parsley does not, unfortunately, add images to mp3 files, and 
+we do this (in `joinmp3.R`) with `ffmpeg`. It is important to note that
+this NOT be performed before conversion of the mp3 files to m4b. We spent
+the better part of an afternoon trying different methods to insert the 
+cover image and achieve the appropriate mp3 to m4b conversion before a
+careful test established this.
 
-### (Optionally) Adjust audio file characteristics
+There are some other tools useful for removing or inserting images, of 
+which the `eyed3` package is useful (with command `eyeD3`).
+
+### 16) (Optionally) Adjust audio file characteristics
 
 The program **audacity** is useful to change speed, tempo or pitch of audio
 files. Some text-to-speech models create output that is very quick. Slower
-and lower-pitched output may be helpful to listeners.
+and lower-pitched output may be helpful to listeners. We found an approximate
+8 percent slowing of playback (with concurrent pitch reduction) was helpful
+with some of the voices.
 
 ## Open needs
 
-- A fix for the first stage of epub2tts-edge so that monospaced font material
-is included. An alternative would be tools to work with other epub to text
-translation tools such as **pandoc** or **epub2txt** mentioned above that also 
-establish the paragraph structure without line endings. At the moment a text 
-editor is used.
+- The loss of material in the initial conversion from epub to text is a 
+serious issue. A fix for this first stage of epub2tts-edge so that monospaced 
+(or other problematic) material is always included. An alternative would be 
+tools to work with other epub to text translation tools such as **pandoc** or 
+**epub2txt** mentioned above that also establish the paragraph structure
+without line endings. At the moment a more or less plain text editor is used
+for this work.
 
-- Until and unless the large language models can cope with various proper names,
-homonymns and dialect, tools to streamline the replacement of selected words with
-phonetic substitutes will be welcome. It would be helpful to have a GUI editor
-that highlights target words and offers replacements. Such tools already exist for
-spelling checkers, so this is not an idle possibility.
+- Until and unless the large language models can cope with various proper 
+names, homographs and dialect, tools to streamline the replacement of selected
+words with phonetic substitutes will be welcome. It would be helpful to have a
+GUI editor that highlights target words and offers replacements. Such tools
+already exist for spelling checkers, so this is not an idle possibility.
 
-- epub2tts-edge needs an active internet connection to function. There are a number
-of situations where it would be important to be able to prepare audio output from
-text WITHOUT the need for a connection to the Microsoft service. Moreover, it is
-by no means certain that this service will be continued, or continued on the same
-basis as at present.
-
-## Special cases 
-
-An attempt to convert the epub of novel "Moonbeam Shadows" (file: Moonbeam.epub)
-to text with
-
-epub2tts-edge Moonbeam.epub
-
-failed with the messages as follows.
-
-```
-Namespace(sourcefile='Moonbeam.epub', speaker='en-US-AndrewNeural', cover=None)
-Cover image saved to Moonbeam.png
-Exporting Moonbeam.epub to Moonbeam.txt
-Traceback (most recent call last):
-  File "/home/john/.local/bin/epub2tts-edge", line 8, in <module>
-    sys.exit(main())
-  File "/home/john/.local/lib/python3.10/site-packages/epub2tts_edge/epub2tts_edge.py", line 388, in main
-    export(book, args.sourcefile)
-  File "/home/john/.local/lib/python3.10/site-packages/epub2tts_edge/epub2tts_edge.py", line 113, in export
-    author = book.get_metadata("DC", "creator")[0][0]
-IndexError: list index out of range
-john@M21:~/Videos/moonbeam$ 
-```
-
-Similarly, **Dodging Potholes** gave the same error. There are likely others.
-
-## Future goals and needs
-
-1) need a script to run pandoc to text
-
-pandoc -f epub -t plain -o filename.txt filename.epub
-
-2) Need a script to run all the parts
- 
-   - copy epub to shortened name
-   - build profile to use for inputs
-   - modify scripts to work together
-   - timers and log files
-   - testing and reporting.
-
+- epub2tts-edge needs an active internet connection to function. There are a
+number of situations where it would be important to be able to prepare audio
+output from text WITHOUT the need for a connection to the Microsoft service.
+Moreover, it is by no means certain that this service will be continued, or
+continued on the same basis as at present.
 
 ## Conclusions
 
@@ -813,13 +891,14 @@ large-scale text to speech, at least in the open-source world.
 engines. While not mentioned much in the article, the Coqui AI TTS was tried,
 but found wanting.
 
-- Workarounds have been found for almost all the glitches discovered. These have,
+- Workarounds have been found for most of the glitches discovered. These have,
 however, requires quite a lot of work. 
 
-- Pronunciation and emphasis issues still are found. 
+- Pronunciation and emphasis issues still are found. These are not major, but may
+still sound jarring to the listener.
 
-- The lack of a way to tell the TTS engine what language a segment of text is
-using is a serious fault and causes a number of issues. It would also be useful
+- The lack of a way to tell the TTS engine what language a segment of text should 
+be used is a serious fault and causes a number of issues. It would also be useful
 to be able to specify emphasized or softer speech, or to specify the "speaker"
 voice for novels with more than one narrator, such as 
 https://www.obooko.com/free-historical-fiction-books/dodging-the-potholes .
@@ -836,11 +915,25 @@ suddenly impose a charging model on the parts of edge-TTS now open.
 
 ## Appendix 1: epub2tts-edge voices
 
-?? How to get a list
+There is a list of voices at the end of this document. This was obtained
+using a feature of the `edge-tts` project from https://github.com/rany2/edge-tts. This can be installed under Python 3.12
+in the Linux Mint 22 Wilma operating system with the terminal command
+
+```
+pipx install edge-tts
+```
+
+Then the command
+
+```
+edge-tts --list-voices > edgevoices.txt
+```
+
+will create a text file of documented voices.
 
 ### How to get audio samples
 
-The program **get-edge-tts-samples.py** shows how to get examples of audio for
+The program **get-edge-tts-samples.py** shows how to get samples of audio for
 different edge-tts speakers.
 
 ```
@@ -885,7 +978,9 @@ There are a number of lists of edge-tts voices. One is at https://github.com/ran
 
 ## Appendix A: Possible troubles
 
-The following text MAY still give problems and need to be checked
+The following text is believed to be likely to give problems so that 
+audio output will need to be checked. Different voices appear to have
+different language models, so some will "work" while others will not.
 
 ```
 # Oddbods.txt
@@ -929,19 +1024,18 @@ V-1 may be better as V 1
 
 ### convm4b.sh -- convert m4b files to mp3
 
-```{r comment='', echo=FALSE}
-cat(readLines('convm4b.sh'), sep = '\n')
+```{r comment='convm4b.sh', echo=FALSE}
+cat(readLines('../baseabsw/convm4b.sh'), sep = '\n')
 ```
 
 ### combpart.R -- combine individual book sections 
 
-The purpose of this script is to create texts that will have a reasonable audio file
-duration, particularly when in mp3 form, which is more difficult in most cases to
-position or resume playing. The number of parts to combine is set at `np <- 10` in
-the present version.
+The purpose of this script is to create texts that will have a reasonable 
+audio file duration, particularly when in mp3 form, which is more difficult in most cases to position or resume playing. The number of parts to combine is 
+set at `np <- 10` in the present version.
 
-```{r comment='', echo=FALSE}
-cat(readLines('combpart.R'), sep = '\n')
+```{r comment='combpart.R', echo=FALSE}
+cat(readLines('../baseabsw/combpart.R'), sep = '\n')
 ```
 
 ### novelparas.R -- remove single line endings to get paragraphs
@@ -949,1078 +1043,39 @@ cat(readLines('combpart.R'), sep = '\n')
 **epub2tts-edge** will pause on line endings. Paragraphs are therefore assumed
 to be terminated by a line ending.
 
-```{r comment='', echo=FALSE}
-cat(readLines('novelparas.R'), sep = '\n')
+```{r comment='novelparas.R', echo=FALSE}
+cat(readLines('../baseabsw/novelparas.R'), sep = '\n')
 ```
 
 ### numpart.R -- number sections that have generic divider naming
 
-This script is intended to convert dividers `# Part ??` into numbered dividers.
-It requires generic dividers of the form `* * *` to be converted to `# Part ??`
-with a text editor.
+This script is intended to convert dividers `# Part ??` into numbered dividers. It requires generic dividers of the form `* * *` to be converted 
+to `# Part ??` with a text editor.
 
-```{r comment='', echo=FALSE}
-cat(readLines('numpart.R'), sep = '\n')
+```{r comment='numpart.R', echo=FALSE}
+cat(readLines('../baseabsw/numpart.R'), sep = '\n')
 ```
 
 ### splitnovel.R -- divide book text file into individual sections with headers
 
-```{r comment='', echo=FALSE}
-cat(readLines('splitnovel.R'), sep = '\n')
+```{r comment='splitnovel.R', echo=FALSE}
+cat(readLines('../baseabsw/splitnovel.R'), sep = '\n')
+```
+
+### joinmp3.R -- consolidate, convert and add images
+
+`joinmp3.R` works out which files to consolidate to yield a 
+small number of rougly equal-sized mp3 files. These are 
+converted to m4a files which are renamed to m4b files. 
+Then cover images are added to both sets of files.
+
+```{r comment='joinmp3.R', echo=FALSE}
+cat(readLines('../baseabsw/joinmp3.R'), sep = '\n')
 ```
 
 
-<!-- ./Thuraft/numparts.R -- number the parts in Coffee Klatch Curmudgeon -->
-<!-- ./dodging/numparts.R -- number the parts in Dodging the Potholes -- probably buggy -->
-<!-- ./dodging/numpart2.R -- number the parts in the DodgingX.txt file -->
-<!-- ./dodging/consolidate/makeffmpeginput.R -->
-<!-- ./dodging/splitname.R -- split DodgingY.txt into parts for Anna, Martin and Michelle -->
-<!-- 	and put these in separate directories for processing to audio files -->
-<!-- ./dodging/splitpart.R -- earlier splitter -- not used -->
-<!-- ./curmudgeon/splitpartck.R -- split parts of curmudgeon to have separate files -->
-<!-- ./splitter.R -- generic splitter -->
-<!-- ./partnums.R -- generic numbering program -->
-<!-- ./ontheshelf/partnums.R -- on the shelf numbering -->
-<!-- ./ontheshelf/splitterots.R -- split on the shelf (is that needed?) -->
-<!-- ./Phoenix/numparts.R -- number Phoenix parts -->
-
-<!-- ### command line scripts -->
-
-<!-- ./edgeinstallepub2tts.sh -- installer for epub2tts-edge -->
-<!-- ./dodging/consolidate/convm4b.sh -- convert m4b files to mp3 -->
-<!-- ./dodging/consolidate/newfiles/fjoin.sh -- illustrate ffmpeg concatenation.  -->
-<!-- ./dodging/martin/martin.sh -- convert Martin voice files to m4b (defines voice) -->
-<!-- ./dodging/anna/annasonia.sh -- ditto Anna -->
-<!-- ./dodging/anna/done/anna.sh -- ditto Anna (?? Clara voice) -->
-<!-- ./dodging/michelle/michelle.sh -- ditto Michelle -->
-<!-- ./curmudgeon/convm4b.sh -- as above (to mp3) -->
-<!-- ./curmudgeon/makeck.sh -- apply epub2tts-edge to each of the parts of Curmudgion -->
-<!-- ./convm4b.sh -- as above m4b to mp3 -->
-<!-- ./installepub2tts.sh -- install Aedo's epub2tts (uses Coqui TTS) -->
-<!-- ./ontheshelf/tryepub2tts/rx.sh -- OTS trial using Coqui on one part -->
-<!-- ./ontheshelf/tryepub2tts/runots.sh -- OTS trial using Coqui on parts -->
-<!-- ./ontheshelf/runots.sh -- similar -->
-<!-- ./ontheshelf/wrk/runots.sh -- similar -->
-<!-- ./ontheshelf/runotsx.sh -- similar (Coqui form is in parts) -->
-<!-- ./txt2mp3.sh -- test of gtts-cli on a small piece of text -->
-<!-- ./smalltests/e.sh -- small test on e.txt -->
-<!-- ./moonbeam/mbinstr.sh  -- make Moonbeam audio -->
-<!-- ./Leftoversedge/Leftovers-epub2tts-wav/cwav2mp3.sh Wav to mp3 -->
-<!-- ./Leftoversedge/cwav2mp3.sh -- ditto -->
-<!-- ./LoveIrontries/ex.sh -- run some parts of Love and Iron -->
-<!-- ./CoquiTTS_XTTS_Examples/runAllSpeakers.sh -- Aedo example of all speakers -->
-<!-- ./CoquiTTS_XTTS_Examples/xttsSpeaker.sh -- Aedo examples of commands for epub2tts -->
-
-
-<!-- ## Appendix C: epub2tts voices -->
-
-<!-- **epub2tts** a 1-step tool, but works best with a plain text file, including -->
-<!-- the file mybook.txt above. -->
-
-<!-- ``` -->
-<!-- epub2tts --speaker (valid Coqui speaker id) --cover mybook.png mybook.txt -->
-<!-- ``` -->
-
-<!-- The Coqui speaker id's are different from those in Microsoft's **edge** -->
-<!-- tts tools. They are ID's like p340.  -->
-
-<!-- A list of voices can be obtained by ...?? -->
-
-<!-- ## Appendix D: Using a custom voice -->
-
-<!-- I have not had any success in doing this.  -->
-
-<!-- epub2tts --xtts TA01.wav,TA03.wav,TA23.wav --language 'en' LeftoversCalibre.txt -->
-
-<!-- failed after a lot of work with error -->
-
-<!-- File "/home/john/.local/lib/python3.10/site-packages/deepspeed/ops/op_builder/cpu/no_impl.py", line 21, in load -->
-<!--     raise ValueError("This op had not been implemented on CPU backend.") -->
-<!-- ValueError: This op had not been implemented on CPU backend. -->
-
 ## Appendix C: List of voices usable by epub2tts-edge
 
-### Multilingual voices
-
-Name: de-DE-FlorianMultilingualNeural
-Gender: Male
-
-Name: de-DE-SeraphinaMultilingualNeural
-Gender: Female
-
-Name: en-US-AndrewMultilingualNeural
-Gender: Male
-
-Name: en-US-AvaMultilingualNeural
-Gender: Female
-
-Name: en-US-BrianMultilingualNeural
-Gender: Male
-
-Name: en-US-EmmaMultilingualNeural
-Gender: Female
-
-Name: fr-FR-RemyMultilingualNeural
-Gender: Male
-
-Name: fr-FR-VivienneMultilingualNeural
-Gender: Female
-
-### Single language voices
-
-
-Name: af-ZA-AdriNeural
-Gender: Female
-
-Name: af-ZA-WillemNeural
-Gender: Male
-
-Name: am-ET-AmehaNeural
-Gender: Male
-
-Name: am-ET-MekdesNeural
-Gender: Female
-
-Name: ar-AE-FatimaNeural
-Gender: Female
-
-Name: ar-AE-HamdanNeural
-Gender: Male
-
-Name: ar-BH-AliNeural
-Gender: Male
-
-Name: ar-BH-LailaNeural
-Gender: Female
-
-Name: ar-DZ-AminaNeural
-Gender: Female
-
-Name: ar-DZ-IsmaelNeural
-Gender: Male
-
-Name: ar-EG-SalmaNeural
-Gender: Female
-
-Name: ar-EG-ShakirNeural
-Gender: Male
-
-Name: ar-IQ-BasselNeural
-Gender: Male
-
-Name: ar-IQ-RanaNeural
-Gender: Female
-
-Name: ar-JO-SanaNeural
-Gender: Female
-
-Name: ar-JO-TaimNeural
-Gender: Male
-
-Name: ar-KW-FahedNeural
-Gender: Male
-
-Name: ar-KW-NouraNeural
-Gender: Female
-
-Name: ar-LB-LaylaNeural
-Gender: Female
-
-Name: ar-LB-RamiNeural
-Gender: Male
-
-Name: ar-LY-ImanNeural
-Gender: Female
-
-Name: ar-LY-OmarNeural
-Gender: Male
-
-Name: ar-MA-JamalNeural
-Gender: Male
-
-Name: ar-MA-MounaNeural
-Gender: Female
-
-Name: ar-OM-AbdullahNeural
-Gender: Male
-
-Name: ar-OM-AyshaNeural
-Gender: Female
-
-Name: ar-QA-AmalNeural
-Gender: Female
-
-Name: ar-QA-MoazNeural
-Gender: Male
-
-Name: ar-SA-HamedNeural
-Gender: Male
-
-Name: ar-SA-ZariyahNeural
-Gender: Female
-
-Name: ar-SY-AmanyNeural
-Gender: Female
-
-Name: ar-SY-LaithNeural
-Gender: Male
-
-Name: ar-TN-HediNeural
-Gender: Male
-
-Name: ar-TN-ReemNeural
-Gender: Female
-
-Name: ar-YE-MaryamNeural
-Gender: Female
-
-Name: ar-YE-SalehNeural
-Gender: Male
-
-Name: az-AZ-BabekNeural
-Gender: Male
-
-Name: az-AZ-BanuNeural
-Gender: Female
-
-Name: bg-BG-BorislavNeural
-Gender: Male
-
-Name: bg-BG-KalinaNeural
-Gender: Female
-
-Name: bn-BD-NabanitaNeural
-Gender: Female
-
-Name: bn-BD-PradeepNeural
-Gender: Male
-
-Name: bn-IN-BashkarNeural
-Gender: Male
-
-Name: bn-IN-TanishaaNeural
-Gender: Female
-
-Name: bs-BA-GoranNeural
-Gender: Male
-
-Name: bs-BA-VesnaNeural
-Gender: Female
-
-Name: ca-ES-EnricNeural
-Gender: Male
-
-Name: ca-ES-JoanaNeural
-Gender: Female
-
-Name: cs-CZ-AntoninNeural
-Gender: Male
-
-Name: cs-CZ-VlastaNeural
-Gender: Female
-
-Name: cy-GB-AledNeural
-Gender: Male
-
-Name: cy-GB-NiaNeural
-Gender: Female
-
-Name: da-DK-ChristelNeural
-Gender: Female
-
-Name: da-DK-JeppeNeural
-Gender: Male
-
-Name: de-AT-IngridNeural
-Gender: Female
-
-Name: de-AT-JonasNeural
-Gender: Male
-
-Name: de-CH-JanNeural
-Gender: Male
-
-Name: de-CH-LeniNeural
-Gender: Female
-
-Name: de-DE-AmalaNeural
-Gender: Female
-
-Name: de-DE-ConradNeural
-Gender: Male
-
-Name: de-DE-FlorianMultilingualNeural
-Gender: Male
-
-Name: de-DE-KatjaNeural
-Gender: Female
-
-Name: de-DE-KillianNeural
-Gender: Male
-
-Name: de-DE-SeraphinaMultilingualNeural
-Gender: Female
-
-Name: el-GR-AthinaNeural
-Gender: Female
-
-Name: el-GR-NestorasNeural
-Gender: Male
-
-Name: en-AU-NatashaNeural
-Gender: Female
-
-Name: en-AU-WilliamNeural
-Gender: Male
-
-Name: en-CA-ClaraNeural
-Gender: Female
-
-Name: en-CA-LiamNeural
-Gender: Male
-
-Name: en-GB-LibbyNeural
-Gender: Female
-
-Name: en-GB-MaisieNeural
-Gender: Female
-
-Name: en-GB-RyanNeural
-Gender: Male
-
-Name: en-GB-SoniaNeural
-Gender: Female
-
-Name: en-GB-ThomasNeural
-Gender: Male
-
-Name: en-HK-SamNeural
-Gender: Male
-
-Name: en-HK-YanNeural
-Gender: Female
-
-Name: en-IE-ConnorNeural
-Gender: Male
-
-Name: en-IE-EmilyNeural
-Gender: Female
-
-Name: en-IN-NeerjaExpressiveNeural
-Gender: Female
-
-Name: en-IN-NeerjaNeural
-Gender: Female
-
-Name: en-IN-PrabhatNeural
-Gender: Male
-
-Name: en-KE-AsiliaNeural
-Gender: Female
-
-Name: en-KE-ChilembaNeural
-Gender: Male
-
-Name: en-NG-AbeoNeural
-Gender: Male
-
-Name: en-NG-EzinneNeural
-Gender: Female
-
-Name: en-NZ-MitchellNeural
-Gender: Male
-
-Name: en-NZ-MollyNeural
-Gender: Female
-
-Name: en-PH-JamesNeural
-Gender: Male
-
-Name: en-PH-RosaNeural
-Gender: Female
-
-Name: en-SG-LunaNeural
-Gender: Female
-
-Name: en-SG-WayneNeural
-Gender: Male
-
-Name: en-TZ-ElimuNeural
-Gender: Male
-
-Name: en-TZ-ImaniNeural
-Gender: Female
-
-Name: en-US-AnaNeural
-Gender: Female
-
-Name: en-US-AndrewMultilingualNeural
-Gender: Male
-
-Name: en-US-AndrewNeural
-Gender: Male
-
-Name: en-US-AriaNeural
-Gender: Female
-
-Name: en-US-AvaMultilingualNeural
-Gender: Female
-
-Name: en-US-AvaNeural
-Gender: Female
-
-Name: en-US-BrianMultilingualNeural
-Gender: Male
-
-Name: en-US-BrianNeural
-Gender: Male
-
-Name: en-US-ChristopherNeural
-Gender: Male
-
-Name: en-US-EmmaMultilingualNeural
-Gender: Female
-
-Name: en-US-EmmaNeural
-Gender: Female
-
-Name: en-US-EricNeural
-Gender: Male
-
-Name: en-US-GuyNeural
-Gender: Male
-
-Name: en-US-JennyNeural
-Gender: Female
-
-Name: en-US-MichelleNeural
-Gender: Female
-
-Name: en-US-RogerNeural
-Gender: Male
-
-Name: en-US-SteffanNeural
-Gender: Male
-
-Name: en-ZA-LeahNeural
-Gender: Female
-
-Name: en-ZA-LukeNeural
-Gender: Male
-
-Name: es-AR-ElenaNeural
-Gender: Female
-
-Name: es-AR-TomasNeural
-Gender: Male
-
-Name: es-BO-MarceloNeural
-Gender: Male
-
-Name: es-BO-SofiaNeural
-Gender: Female
-
-Name: es-CL-CatalinaNeural
-Gender: Female
-
-Name: es-CL-LorenzoNeural
-Gender: Male
-
-Name: es-CO-GonzaloNeural
-Gender: Male
-
-Name: es-CO-SalomeNeural
-Gender: Female
-
-Name: es-CR-JuanNeural
-Gender: Male
-
-Name: es-CR-MariaNeural
-Gender: Female
-
-Name: es-CU-BelkysNeural
-Gender: Female
-
-Name: es-CU-ManuelNeural
-Gender: Male
-
-Name: es-DO-EmilioNeural
-Gender: Male
-
-Name: es-DO-RamonaNeural
-Gender: Female
-
-Name: es-EC-AndreaNeural
-Gender: Female
-
-Name: es-EC-LuisNeural
-Gender: Male
-
-Name: es-ES-AlvaroNeural
-Gender: Male
-
-Name: es-ES-ElviraNeural
-Gender: Female
-
-Name: es-ES-XimenaNeural
-Gender: Female
-
-Name: es-GQ-JavierNeural
-Gender: Male
-
-Name: es-GQ-TeresaNeural
-Gender: Female
-
-Name: es-GT-AndresNeural
-Gender: Male
-
-Name: es-GT-MartaNeural
-Gender: Female
-
-Name: es-HN-CarlosNeural
-Gender: Male
-
-Name: es-HN-KarlaNeural
-Gender: Female
-
-Name: es-MX-DaliaNeural
-Gender: Female
-
-Name: es-MX-JorgeNeural
-Gender: Male
-
-Name: es-NI-FedericoNeural
-Gender: Male
-
-Name: es-NI-YolandaNeural
-Gender: Female
-
-Name: es-PA-MargaritaNeural
-Gender: Female
-
-Name: es-PA-RobertoNeural
-Gender: Male
-
-Name: es-PE-AlexNeural
-Gender: Male
-
-Name: es-PE-CamilaNeural
-Gender: Female
-
-Name: es-PR-KarinaNeural
-Gender: Female
-
-Name: es-PR-VictorNeural
-Gender: Male
-
-Name: es-PY-MarioNeural
-Gender: Male
-
-Name: es-PY-TaniaNeural
-Gender: Female
-
-Name: es-SV-LorenaNeural
-Gender: Female
-
-Name: es-SV-RodrigoNeural
-Gender: Male
-
-Name: es-US-AlonsoNeural
-Gender: Male
-
-Name: es-US-PalomaNeural
-Gender: Female
-
-Name: es-UY-MateoNeural
-Gender: Male
-
-Name: es-UY-ValentinaNeural
-Gender: Female
-
-Name: es-VE-PaolaNeural
-Gender: Female
-
-Name: es-VE-SebastianNeural
-Gender: Male
-
-Name: et-EE-AnuNeural
-Gender: Female
-
-Name: et-EE-KertNeural
-Gender: Male
-
-Name: fa-IR-DilaraNeural
-Gender: Female
-
-Name: fa-IR-FaridNeural
-Gender: Male
-
-Name: fi-FI-HarriNeural
-Gender: Male
-
-Name: fi-FI-NooraNeural
-Gender: Female
-
-Name: fil-PH-AngeloNeural
-Gender: Male
-
-Name: fil-PH-BlessicaNeural
-Gender: Female
-
-Name: fr-BE-CharlineNeural
-Gender: Female
-
-Name: fr-BE-GerardNeural
-Gender: Male
-
-Name: fr-CA-AntoineNeural
-Gender: Male
-
-Name: fr-CA-JeanNeural
-Gender: Male
-
-Name: fr-CA-SylvieNeural
-Gender: Female
-
-Name: fr-CA-ThierryNeural
-Gender: Male
-
-Name: fr-CH-ArianeNeural
-Gender: Female
-
-Name: fr-CH-FabriceNeural
-Gender: Male
-
-Name: fr-FR-DeniseNeural
-Gender: Female
-
-Name: fr-FR-EloiseNeural
-Gender: Female
-
-Name: fr-FR-HenriNeural
-Gender: Male
-
-Name: fr-FR-RemyMultilingualNeural
-Gender: Male
-
-Name: fr-FR-VivienneMultilingualNeural
-Gender: Female
-
-Name: ga-IE-ColmNeural
-Gender: Male
-
-Name: ga-IE-OrlaNeural
-Gender: Female
-
-Name: gl-ES-RoiNeural
-Gender: Male
-
-Name: gl-ES-SabelaNeural
-Gender: Female
-
-Name: gu-IN-DhwaniNeural
-Gender: Female
-
-Name: gu-IN-NiranjanNeural
-Gender: Male
-
-Name: he-IL-AvriNeural
-Gender: Male
-
-Name: he-IL-HilaNeural
-Gender: Female
-
-Name: hi-IN-MadhurNeural
-Gender: Male
-
-Name: hi-IN-SwaraNeural
-Gender: Female
-
-Name: hr-HR-GabrijelaNeural
-Gender: Female
-
-Name: hr-HR-SreckoNeural
-Gender: Male
-
-Name: hu-HU-NoemiNeural
-Gender: Female
-
-Name: hu-HU-TamasNeural
-Gender: Male
-
-Name: id-ID-ArdiNeural
-Gender: Male
-
-Name: id-ID-GadisNeural
-Gender: Female
-
-Name: is-IS-GudrunNeural
-Gender: Female
-
-Name: is-IS-GunnarNeural
-Gender: Male
-
-Name: it-IT-DiegoNeural
-Gender: Male
-
-Name: it-IT-ElsaNeural
-Gender: Female
-
-Name: it-IT-GiuseppeNeural
-Gender: Male
-
-Name: it-IT-IsabellaNeural
-Gender: Female
-
-Name: ja-JP-KeitaNeural
-Gender: Male
-
-Name: ja-JP-NanamiNeural
-Gender: Female
-
-Name: jv-ID-DimasNeural
-Gender: Male
-
-Name: jv-ID-SitiNeural
-Gender: Female
-
-Name: ka-GE-EkaNeural
-Gender: Female
-
-Name: ka-GE-GiorgiNeural
-Gender: Male
-
-Name: kk-KZ-AigulNeural
-Gender: Female
-
-Name: kk-KZ-DauletNeural
-Gender: Male
-
-Name: km-KH-PisethNeural
-Gender: Male
-
-Name: km-KH-SreymomNeural
-Gender: Female
-
-Name: kn-IN-GaganNeural
-Gender: Male
-
-Name: kn-IN-SapnaNeural
-Gender: Female
-
-Name: ko-KR-HyunsuNeural
-Gender: Male
-
-Name: ko-KR-InJoonNeural
-Gender: Male
-
-Name: ko-KR-SunHiNeural
-Gender: Female
-
-Name: lo-LA-ChanthavongNeural
-Gender: Male
-
-Name: lo-LA-KeomanyNeural
-Gender: Female
-
-Name: lt-LT-LeonasNeural
-Gender: Male
-
-Name: lt-LT-OnaNeural
-Gender: Female
-
-Name: lv-LV-EveritaNeural
-Gender: Female
-
-Name: lv-LV-NilsNeural
-Gender: Male
-
-Name: mk-MK-AleksandarNeural
-Gender: Male
-
-Name: mk-MK-MarijaNeural
-Gender: Female
-
-Name: ml-IN-MidhunNeural
-Gender: Male
-
-Name: ml-IN-SobhanaNeural
-Gender: Female
-
-Name: mn-MN-BataaNeural
-Gender: Male
-
-Name: mn-MN-YesuiNeural
-Gender: Female
-
-Name: mr-IN-AarohiNeural
-Gender: Female
-
-Name: mr-IN-ManoharNeural
-Gender: Male
-
-Name: ms-MY-OsmanNeural
-Gender: Male
-
-Name: ms-MY-YasminNeural
-Gender: Female
-
-Name: mt-MT-GraceNeural
-Gender: Female
-
-Name: mt-MT-JosephNeural
-Gender: Male
-
-Name: my-MM-NilarNeural
-Gender: Female
-
-Name: my-MM-ThihaNeural
-Gender: Male
-
-Name: nb-NO-FinnNeural
-Gender: Male
-
-Name: nb-NO-PernilleNeural
-Gender: Female
-
-Name: ne-NP-HemkalaNeural
-Gender: Female
-
-Name: ne-NP-SagarNeural
-Gender: Male
-
-Name: nl-BE-ArnaudNeural
-Gender: Male
-
-Name: nl-BE-DenaNeural
-Gender: Female
-
-Name: nl-NL-ColetteNeural
-Gender: Female
-
-Name: nl-NL-FennaNeural
-Gender: Female
-
-Name: nl-NL-MaartenNeural
-Gender: Male
-
-Name: pl-PL-MarekNeural
-Gender: Male
-
-Name: pl-PL-ZofiaNeural
-Gender: Female
-
-Name: ps-AF-GulNawazNeural
-Gender: Male
-
-Name: ps-AF-LatifaNeural
-Gender: Female
-
-Name: pt-BR-AntonioNeural
-Gender: Male
-
-Name: pt-BR-FranciscaNeural
-Gender: Female
-
-Name: pt-BR-ThalitaNeural
-Gender: Female
-
-Name: pt-PT-DuarteNeural
-Gender: Male
-
-Name: pt-PT-RaquelNeural
-Gender: Female
-
-Name: ro-RO-AlinaNeural
-Gender: Female
-
-Name: ro-RO-EmilNeural
-Gender: Male
-
-Name: ru-RU-DmitryNeural
-Gender: Male
-
-Name: ru-RU-SvetlanaNeural
-Gender: Female
-
-Name: si-LK-SameeraNeural
-Gender: Male
-
-Name: si-LK-ThiliniNeural
-Gender: Female
-
-Name: sk-SK-LukasNeural
-Gender: Male
-
-Name: sk-SK-ViktoriaNeural
-Gender: Female
-
-Name: sl-SI-PetraNeural
-Gender: Female
-
-Name: sl-SI-RokNeural
-Gender: Male
-
-Name: so-SO-MuuseNeural
-Gender: Male
-
-Name: so-SO-UbaxNeural
-Gender: Female
-
-Name: sq-AL-AnilaNeural
-Gender: Female
-
-Name: sq-AL-IlirNeural
-Gender: Male
-
-Name: sr-RS-NicholasNeural
-Gender: Male
-
-Name: sr-RS-SophieNeural
-Gender: Female
-
-Name: su-ID-JajangNeural
-Gender: Male
-
-Name: su-ID-TutiNeural
-Gender: Female
-
-Name: sv-SE-MattiasNeural
-Gender: Male
-
-Name: sv-SE-SofieNeural
-Gender: Female
-
-Name: sw-KE-RafikiNeural
-Gender: Male
-
-Name: sw-KE-ZuriNeural
-Gender: Female
-
-Name: sw-TZ-DaudiNeural
-Gender: Male
-
-Name: sw-TZ-RehemaNeural
-Gender: Female
-
-Name: ta-IN-PallaviNeural
-Gender: Female
-
-Name: ta-IN-ValluvarNeural
-Gender: Male
-
-Name: ta-LK-KumarNeural
-Gender: Male
-
-Name: ta-LK-SaranyaNeural
-Gender: Female
-
-Name: ta-MY-KaniNeural
-Gender: Female
-
-Name: ta-MY-SuryaNeural
-Gender: Male
-
-Name: ta-SG-AnbuNeural
-Gender: Male
-
-Name: ta-SG-VenbaNeural
-Gender: Female
-
-Name: te-IN-MohanNeural
-Gender: Male
-
-Name: te-IN-ShrutiNeural
-Gender: Female
-
-Name: th-TH-NiwatNeural
-Gender: Male
-
-Name: th-TH-PremwadeeNeural
-Gender: Female
-
-Name: tr-TR-AhmetNeural
-Gender: Male
-
-Name: tr-TR-EmelNeural
-Gender: Female
-
-Name: uk-UA-OstapNeural
-Gender: Male
-
-Name: uk-UA-PolinaNeural
-Gender: Female
-
-Name: ur-IN-GulNeural
-Gender: Female
-
-Name: ur-IN-SalmanNeural
-Gender: Male
-
-Name: ur-PK-AsadNeural
-Gender: Male
-
-Name: ur-PK-UzmaNeural
-Gender: Female
-
-Name: uz-UZ-MadinaNeural
-Gender: Female
-
-Name: uz-UZ-SardorNeural
-Gender: Male
-
-Name: vi-VN-HoaiMyNeural
-Gender: Female
-
-Name: vi-VN-NamMinhNeural
-Gender: Male
-
-Name: zh-CN-XiaoxiaoNeural
-Gender: Female
-
-Name: zh-CN-XiaoyiNeural
-Gender: Female
-
-Name: zh-CN-YunjianNeural
-Gender: Male
-
-Name: zh-CN-YunxiNeural
-Gender: Male
-
-Name: zh-CN-YunxiaNeural
-Gender: Male
-
-Name: zh-CN-YunyangNeural
-Gender: Male
-
-Name: zh-CN-liaoning-XiaobeiNeural
-Gender: Female
-
-Name: zh-CN-shaanxi-XiaoniNeural
-Gender: Female
-
-Name: zh-HK-HiuGaaiNeural
-Gender: Female
-
-Name: zh-HK-HiuMaanNeural
-Gender: Female
-
-Name: zh-HK-WanLungNeural
-Gender: Male
-
-Name: zh-TW-HsiaoChenNeural
-Gender: Female
-
-Name: zh-TW-HsiaoYuNeural
-Gender: Female
-
-Name: zh-TW-YunJheNeural
-Gender: Male
-
-Name: zu-ZA-ThandoNeural
-Gender: Female
-
-Name: zu-ZA-ThembaNeural
-Gender: Male
-
-
+```{r comment='voices', echo=FALSE}
+cat(readLines('edgevoices.txt'), sep = '\n')
+```
