@@ -21,7 +21,9 @@ allow me to experiment quickly and interactively.
 
 I've a work-in-progress write-up of my explorations as 
 https://github.com/nashjc/audiobook-notes/blob/main/AudiobookExperiments.pdf with the corresponding
-RMarkdown (.Rmd) file being the source text.
+RMarkdown (.Rmd) file being the source text. Some results of the experiments as well as source
+material (epubs etc.) are at https://web.ncf.ca/nashjc/novels/ with audio in the m4b-audio and mp3-audio
+directories. 
 
 As and when some of the tools and ideas discussed here become established as useful and stable, I
 am hopeful that they can be incorporated in Christopher's repository for the convenience of other
