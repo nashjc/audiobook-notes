@@ -31,4 +31,4 @@ workers. I welcome comments and collaboration, as one of my motivations is to pr
 a friend who is legally blind. My gratitude to all who have contributed to making possible TTS
 tools, as my friend has said that the output audio quality and rhythm is, overall, very good.
 
-John Nash, 2024-11-01
+John Nash, 2025-1-22
